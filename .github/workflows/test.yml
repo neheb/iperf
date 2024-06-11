@@ -33,3 +33,24 @@ jobs:
         ./configure && make && make check
         timeout 300 src/iperf3 -s &
         ./test_commands.sh localhost
+  build-test-alpine:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [ 'aarch64', 'armhf', 'armv7', 'ppc64le', 'riscv64', 's390x' ]
+    defaults:
+      run:
+        shell: alpine.sh {0}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: jirutka/setup-alpine@v1
+      with:
+        branch: edge
+        arch: ${{matrix.arch}}
+        packages: >
+          build-base
+    - name: build
+      run: |
+        ./configure && make && make check
+        timeout 300 src/iperf3 -s &
+        ./test_commands.sh localhost
